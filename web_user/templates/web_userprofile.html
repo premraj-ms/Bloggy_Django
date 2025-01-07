@@ -1,0 +1,204 @@
+{% include "web_includes/header.html" %}
+
+{% if request.session.user_id %}
+        <!-- profile page  -->
+        <div class="min-h-screen bg-gray-100 p-6">
+            <!-- Profile Card -->
+            <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="flex flex-col md:flex-row">
+                    <!-- Profile Picture Section -->
+                    <div class="bg-blue-500 flex-shrink-0 flex items-center justify-center md:w-1/3">
+                        <img  class="rounded-full bg-white w-40 h-40 md:w-48 md:h-48 object-cover border-4 border-white shadow-lg"
+                            src="{% if users.user_profile_image and 'http' in users.user_profile_image.url %}{{ users.user_profile_image }}
+                    {% elif users.user_profile_image %}{{ users.user_profile_image.url }}
+                   {% endif %}"  alt="Profile Picture" />
+                    </div>
+
+                    <!-- User Info Section -->
+                    <div class="p-6 md:w-2/3">
+                        <h2 class="text-2xl font-semibold text-gray-800">
+                            {{users.full_name}}
+                        </h2>
+                        <p class="text-gray-600 text-sm">{{users.user_name}}</p>
+                        <p class="mt-4 text-gray-700">
+                            {{users.user_bio}}
+                        </p>
+
+                        <!-- User Stats -->
+                        <div class="mt-6 flex space-x-6">
+                            <div class="text-center">
+                                <h3 class="text-xl font-semibold text-gray-800">120</h3>
+                                <p class="text-sm text-gray-600">Posts</p>
+                            </div>
+                            <div class="text-center">
+                                <h3 class="text-xl font-semibold text-gray-800">500</h3>
+                                <p class="text-sm text-gray-600">Followers</p>
+                            </div>
+                            <div class="text-center">
+                                <h3 class="text-xl font-semibold text-gray-800">180</h3>
+                                <p class="text-sm text-gray-600">Following</p>
+                            </div>
+                        </div>
+
+                        <!-- Social Links -->
+                        <div class="mt-6">
+                            <a href="#"
+                                class="inline-block bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-lg mr-2">Manage Posts</a>
+                            <a href="{% url "web_user_edit" %}"
+                                class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm px-4 py-2 rounded-lg">Edit Profile</a>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="max-w-4xl mx-auto mt-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% if users.user_about  %}
+                    <!-- About Section -->
+                    <div class="bg-white shadow-lg rounded-lg p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">About</h3>
+                        <p class="mt-4 text-gray-700">
+                            {{users.user_about}}
+                        </p>
+                    </div>
+                    {% endif %}
+                    <!-- Skills Section -->
+                    <div class="bg-white shadow-lg rounded-lg p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Contribution</h3>
+                        <ul class="mt-4 space-y-2">
+                            <li class="flex items-center">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                                JavaScript (React, Node.js)
+                            </li>
+                            <li class="flex items-center">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                                Python (Django, Flask)
+                            </li>
+                            <li class="flex items-center">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                                Cloud Computing (AWS, Azure)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        <!-- blog list  -->
+        <div class="min-h-screen bg-gray-100 p-6">
+            <!-- Blog List Container -->
+            <div class="max-w-7xl mx-auto">
+                <h1 class="text-4xl font-bold text-gray-800 text-center mb-8">Latest Blog Posts</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+               {% for post in posts %}
+               <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+                <!-- Cover Image -->
+                {% if post.post_cover %}
+                <a href="{% url "web_post" post.post_category.catSlug post.post_slug %}" >
+                    
+                  <img src="{{ post.post_cover.url }}" alt="{{ post.post_title }}" class="w-full h-48 object-cover">
+                </a> {% endif %}
+                
+                <!-- Content Section -->
+                <div class="p-6">
+                  <span style="background-color: {{post.post_category.catColor}};" class="inline-block px-3 py-1 text-xs font-semibold text-white  rounded-full">
+                  {{post.post_category.catName}}
+                </span>
+                    <!-- Blog Title -->
+                    <h2 class="text-xl font-bold text-gray-800">
+                    <a href="{% url "web_post" post.post_category.catSlug post.post_slug %}">
+                      {{ post.post_title }}
+                    </a>
+                    </h2>
+                    
+                    <!-- Author and Date -->
+                    <div class="flex items-center mt-4">
+                      <a href="{% url 'user_page'  post.post_author.user_name %}"> <img src="{% if post.post_author.user_profile_image and 'http' in post.post_author.user_profile_image.url %}
+            {{ post.post_author.user_profile_image }}
+          {% elif post.post_author.user_profile_image %}
+            {{ post.post_author.user_profile_image.url }}
+          {% endif %}" alt="{{ post.post_author.full_name }}" class="w-10 h-10 rounded-full object-cover"></a>
+                        <div class="ml-3">
+                          <a href="{% url 'user_page'  post.post_author.user_name %}"><p class="text-sm font-medium text-gray-800">{{ post.post_author.full_name }}</p></a>
+                            <p class="text-sm text-gray-500">Published on {{ post.post_author.created_at|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Blog Description -->
+                    {% if post.post_desc %}
+                    <p class="text-gray-600 mt-2">
+                        {{ post.post_desc }}
+                    </p>
+                    {% endif %}
+                    
+                    <!-- Meta Information -->
+                    <div class="flex items-center justify-between mt-4 text-gray-600">
+                        <!-- Comment Icon with Number -->
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 16.054A9.936 9.936 0 0021.957 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5.523 4.477 10 10 10 2.191 0 4.208-.703 5.854-1.895l4.444.49a1 1 0 001.102-1.102l-.49-4.444z"></path>
+                            </svg>
+                            <span class="ml-1 text-sm">{{ post.comment_count }} Comments</span>
+                        </div>
+                        
+                        <!-- Eye Icon with View Count -->
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm-3-9C5.373 3 1 8.477 1 12s4.373 9 9 9 9-4.477 9-9-4.373-9-9-9z"></path>
+                            </svg>
+                            <span class="ml-1 text-sm">{{post.view_count}} Views</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Read More Link -->
+                    <a href="/draft/{{post.id}}" class="inline-block mt-4 text-blue-500 hover:underline font-semibold">
+                        Edit
+                    </a>
+                    <a onclick="return confirm('Are you sure to Delete the blog post? '); " href="{% url "delete_post" post.id %}" class="inline-block mt-4 text-red-500 hover:underline font-semibold">
+                      Delete
+                  </a>
+
+                </div>
+            </div>
+                {% endfor %}
+                    <!-- Add more blog posts as needed -->
+                </div>
+
+<!-- Pagination -->
+<div class="posts">
+    {% for post in posts %}
+        <div class="post">
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.content|truncatewords:20 }}</p>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination Controls -->
+<div class="pagination flex justify-center mt-8">
+    {% if posts.has_previous %}
+        <a href="?page={{ posts.previous_page_number }}" 
+           class="px-4 py-2 mx-1 bg-white text-gray-700 border rounded hover:bg-blue-500 hover:text-white">
+            Previous
+        </a>
+    {% endif %}
+
+    {% for i in page_range %}
+        <a href="?page={{ i }}" 
+           class="px-4 py-2 mx-1 border rounded {% if i == page %}bg-blue-500 text-white{% else %}bg-white text-gray-700{% endif %}">
+            {{ i }}
+        </a>
+    {% endfor %}
+
+    {% if posts.has_next %}
+        <a href="?page={{ posts.next_page_number }}" 
+           class="px-4 py-2 mx-1 bg-white text-gray-700 border rounded hover:bg-blue-500 hover:text-white">
+            Next
+        </a>
+    {% endif %}
+</div>
+
+            </div>
+        </div>
+{% endif %}
+{% include "web_includes/footer.html" %}

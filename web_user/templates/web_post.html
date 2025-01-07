@@ -1,0 +1,92 @@
+{% include 'web_includes/header.html' %}
+<div class="min-h-screen flex flex-col lg:flex-row gap-8 p-6">
+  <!-- Main Blog Content -->
+  <div class="lg:w-3/4 bg-white shadow-lg rounded-lg overflow-hidden">
+    <!-- Blog Header -->
+    <div class="relative">
+      <img src="{{ post.post_cover.url }}" alt="Blog Cover Image" class="w-full h-64 object-cover" />
+      <div class="absolute bottom-4 left-4 bg-black bg-opacity-60 text-white py-2 px-4 rounded-md">
+        <p class="text-sm">Published on {{ post.post_author.created_at|date:'M d, Y' }}</p>
+      </div>
+    </div>
+
+    <!-- Blog Content -->
+    <div class="p-6">
+      <!-- Blog Title -->
+      <h1 class="text-3xl font-bold text-gray-800">{{ post.post_title }}</h1>
+
+      <!-- Author Details -->
+      <div class="mt-4 flex items-center">
+        <a href="{% url 'user_page'  post.post_author.user_name %}"> <img src="{% if post.post_author.user_profile_image and 'http' in post.post_author.user_profile_image.url %}
+          {{ post.post_author.user_profile_image }}
+        {% elif post.post_author.user_profile_image %}
+          {{ post.post_author.user_profile_image.url }}
+        {% endif %}" alt="{{ post.post_author.full_name }}" class="w-10 h-10 rounded-full object-cover"></a>        <div class="ml-4">
+          <a href="{% url 'user_page'  post.post_author.user_name %}"><p class="text-gray-700 font-semibold">{{ post.post_author.full_name }}</p></a>
+          <p class="text-sm text-gray-500">
+            <a href="{% url 'web_category' post.post_category.catSlug %}" style="background-color: {{ post.post_category.catColor }};" class="text-white text-sm px-3 py-1 rounded-full hover:bg-blue-600">{{ post.post_category.catName }}</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Blog Body -->
+      <div class="main_body mt-6 text-gray-700 space-y-4">{{ post.post_content|safe }}</div>
+
+      <!-- Comment Section -->
+      <div class="mt-8">
+        <h3 class="text-xl font-semibold text-gray-800">Comments</h3>
+
+        {% if request.session.user_id %}
+        <!-- Comment Form -->
+        <form class="mt-4" method="POST" action="{% url "comments_save" post.id %}"> 
+          {% csrf_token %}
+          <input type="text" hidden name="cat_url" value="{{post.post_category.catSlug}}">
+          <input type="text" hidden name="post_url" value="{{post.post_slug}}">
+          <textarea name="comment" placeholder="Leave a comment..." class="w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
+          <button type="submit" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Submit</button>
+        </form>
+        {% else %}
+        <span class="text-blue-600"> <b> <a href="/login">Login To Comment</a> </b> </span>
+        {% endif %}
+
+        <!-- Existing Comments -->
+        <div class="mt-6 space-y-4">
+          <!-- Single Comment -->
+          {% for com in comments  %}
+          
+          <div class="flex items-start">
+            <a href="{% url 'user_page'  com.author.user_name %}"> <img src="{% if com.author.user_profile_image and 'http' in com.author.user_profile_image.url %}
+            {{ com.author.user_profile_image }}
+          {% elif com.author.user_profile_image %}
+            {{ com.author.user_profile_image.url }}
+          {% endif %}" alt="Commenter Avatar" class="w-10 h-10 rounded-full object-cover" /></a>
+            <div class="ml-4">
+              <p class="text-gray-700 font-semibold">{{com.author.full_name}}{% if post.post_author.id == com.author.id %} <b class="text-blue-600"><l class="fa fa-id-badge"></l></b> {% endif %}</p> 
+              <p class="text-sm text-gray-500">{{com.created_at}}</p>
+              <p class="mt-2 text-gray-700">{{com.content}}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar for Related Posts -->
+  <div class="lg:w-1/4 bg-white shadow-lg rounded-lg p-4">
+    <div class="sticky top-0 bg-white  z-10">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Related Posts</h2>
+        {% for i in related %}
+      <div class="flex items-start gap-4 mb-4">
+        <img src="{{i.post_cover.url}}" alt="Post Thumbnail" class="w-16 h-16 object-cover rounded" />
+        <div>
+          <a href="#" class="text-gray-800 font-semibold hover:underline">{{i.post_title}}</a>
+          <p class="text-sm text-gray-500">by {{i.post_author.user_name}}</p>
+          <p class="text-sm text-gray-400">{{ post.post_author.created_at|date:'d/m/Y' }}</p>
+        </div>
+      </div>
+        {% endfor %}
+    </div>
+  </div>
+</div>
+{% include 'web_includes/footer.html' %}

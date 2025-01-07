@@ -1,0 +1,419 @@
+{% include "web_includes/header.html" %}
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
+
+{% if update %}
+<div class="max-w-4xl mx-auto w-full bg-white shadow-md rounded-md p-6">
+    <!-- Page Header -->
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+      Edit Blog Post
+    </h1>
+
+    <!-- Blog Form -->
+    <form action="{% url "post_update_now" post.id %}" method="POST" enctype="multipart/form-data" class="space-y-6" id="blogForm">
+      <!-- Blog Title -->
+       {% csrf_token %}
+      <div>
+        <label for="title" class="block text-gray-700 font-semibold mb-2">Blog Title</label>
+        <input
+          type="text"
+          id="title"
+          name="title" value="{{ post.post_title }}"
+          placeholder="Enter the blog title"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
+      </div>
+      <div>
+        <label for="metaDesc" class="block text-gray-700 font-semibold mb-2">Meta Desc</label>
+        <textarea
+          id="metaDesc"
+          name="metaDesc"
+          placeholder="Enter the meta description"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          required
+        >{{post.post_desc}}</textarea>
+      </div>
+
+      <div>
+        <label for="category" class="block text-gray-700 font-semibold mb-2">Category</label>
+        <select name='category' id="category" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required>
+          <option value="{{post.post_category.id}}">Previous Category</option>
+          {% for cat in categories %}
+          <option value="{{cat.id}}">{{cat.catName}}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Rich Text Content -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Content</label>
+        <div class="relative">
+          <div id="editor" class="h-64 bg-white border border-gray-300 rounded-md"></div>
+          <input type="hidden" id="content" name="content">
+          <button 
+            type="button" 
+            id="openImageModal" 
+            class="absolute top-2 right-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Add Image
+          </button>
+        </div> 
+      </div>
+      
+
+      <!-- Image Upload Modal -->
+      <div id="imageModal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white rounded-md shadow-md w-96 p-4 max-h-[80vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Upload or Select Image</h2>
+            <button id="reloadImages" class="text-blue-600 hover:text-blue-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Upload Image -->
+          <div class="mb-4">
+            <a 
+              target="_blank" 
+              href="{% url 'media_files' %}" 
+              id="uploadBtn" 
+              class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Upload New Image
+            </a>
+          </div>
+
+          <!-- Image List -->
+          <div>
+            <h3 class="text-lg font-semibold mb-2">Available Images</h3>
+            <div id="imageList" class="grid grid-cols-2 gap-3">
+              <!-- Images will be loaded here -->
+              <div class="loading-spinner text-center py-4">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Close Button -->
+          <button 
+            id="closeModal" 
+            class="mt-4 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 w-full"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      <!-- Cover Image -->
+       <i>Ignore it, if you don't need to change it </i>
+      <div>
+        <label for="cover" class="block text-gray-700 font-semibold mb-2">Cover Image</label>
+        <input
+          type="file"
+          id="cover"
+          name="cover"
+          accept="image/*"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-end space-x-4">
+        <button
+          type="button"
+          class="px-6 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+        >
+          Save Draft
+        </button>
+        <button
+          type="submit"
+          class="px-6 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          Publish
+        </button>
+      </div>
+    </form>
+</div>
+{% else %}
+<div class="max-w-4xl mx-auto w-full bg-white shadow-md rounded-md p-6">
+  <!-- Page Header -->
+  <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+    Create Blog Post
+  </h1>
+
+  <!-- Blog Form -->
+  <form action="{% url "post_save" %}" method="POST" enctype="multipart/form-data" class="space-y-6" id="blogForm">
+    <!-- Blog Title -->
+     {% csrf_token %}
+    <div>
+      <label for="title" class="block text-gray-700 font-semibold mb-2">Blog Title</label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        placeholder="Enter the blog title"
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+        required
+      />
+    </div>
+    <div>
+      <label for="metaDesc" class="block text-gray-700 font-semibold mb-2">Meta Desc</label>
+      <textarea
+        id="metaDesc"
+        name="metaDesc"
+        placeholder="Enter the meta description"
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+        required
+      ></textarea>
+    </div>
+
+    <div>
+      <label for="category" class="block text-gray-700 font-semibold mb-2">Category</label>
+      <select name='category' id="category" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required>
+        <option value="0">Select a category</option>
+        {% for cat in categories %}
+        <option value="{{cat.id}}">{{cat.catName}}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Rich Text Content -->
+    <div>
+      <label class="block text-gray-700 font-semibold mb-2">Content</label>
+      <div class="relative">
+        <div id="editor" class="h-64 bg-white border border-gray-300 rounded-md"></div>
+        <input type="hidden" id="content" name="content">
+        <button 
+          type="button" 
+          id="openImageModal" 
+          class="absolute top-2 right-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          Add Image
+        </button>
+      </div> 
+    </div>
+
+    <!-- Image Upload Modal -->
+    <div id="imageModal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white rounded-md shadow-md w-96 p-4 max-h-[80vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold">Upload or Select Image</h2>
+          <button id="reloadImages" class="text-blue-600 hover:text-blue-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Upload Image -->
+        <div class="mb-4">
+          <a 
+            target="_blank" 
+            href="{% url 'media_files' %}" 
+            id="uploadBtn" 
+            class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Upload New Image
+          </a>
+        </div>
+
+        <!-- Image List -->
+        <div>
+          <h3 class="text-lg font-semibold mb-2">Available Images</h3>
+          <div id="imageList" class="grid grid-cols-2 gap-3">
+            <!-- Images will be loaded here -->
+            <div class="loading-spinner text-center py-4">Loading...</div>
+          </div>
+        </div>
+
+        <!-- Close Button -->
+        <button 
+          id="closeModal" 
+          class="mt-4 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 w-full"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+
+    <!-- Cover Image -->
+    <div>
+      <label for="cover" class="block text-gray-700 font-semibold mb-2">Cover Image</label>
+      <input
+        type="file"
+        id="cover"
+        name="cover" required
+        accept="image/*"
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex justify-end space-x-4">
+      <button
+        type="button"
+        class="px-6 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+      >
+        Save Draft
+      </button>
+      <button
+        type="submit"
+        class="px-6 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+      >
+        Publish
+      </button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+ <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Quill editor
+    const quill = new Quill("#editor", {
+      theme: "snow",
+      placeholder: "Write your blog content here...",
+      modules: {
+        toolbar: [
+          [{ 'header': [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline'],
+          ['link', 'blockquote'],
+          [{ list: 'ordered' }, { list: 'bullet' }]
+        ]
+      }
+    });
+{% if update %}
+    // Get and decode the content
+    const content = `{{post.post_content|safe}}`; // Use the correct syntax for your framework
+    const parser = new DOMParser(content);
+    const decodedContent = parser.parseFromString(content, 'text/html').body.innerHTML;
+    console.log("Decoded content:", decodedContent); // Debugging
+ 
+    // Paste content into the editor
+    quill.clipboard.dangerouslyPasteHTML(decodedContent);
+{% endif %}
+
+    // Get references to form and hidden input
+    const blogForm = document.getElementById('blogForm');
+    const contentInput = document.getElementById('content');
+
+    // Check if we're on the blog form page
+    if (blogForm && contentInput) {
+        // Update hidden input with Quill content whenever it changes
+        quill.on('text-change', function() {
+          const content = quill.root.innerHTML;
+          contentInput.value = content;
+        });
+
+        // Ensure content is set before form submission
+        blogForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Get the content from Quill and set it to hidden input
+          const content = quill.root.innerHTML;
+          contentInput.value = content;
+
+          // Validate form
+          if (content.trim() === '<p><br></p>' || content.trim() === '') {
+            alert('Please add some content to your blog post.');
+            return;
+          }
+
+          const categorySelect = document.getElementById('category');
+          if (categorySelect && categorySelect.value === '0') {
+            alert('Please select a category.');
+            return;
+          }
+
+          // Submit the form
+          this.submit();
+        });
+    }
+
+    // Modal elements
+    const imageModal = document.getElementById('imageModal');
+    const openImageModal = document.getElementById('openImageModal');
+    const closeModal = document.getElementById('closeModal');
+    const imageList = document.getElementById('imageList');
+    const reloadImages = document.getElementById('reloadImages');
+
+    // Only setup modal functionality if we have the required elements
+    if (imageModal && openImageModal && closeModal && imageList) {
+        // Modal controls
+        openImageModal.addEventListener('click', () => {
+          imageModal.classList.remove('hidden');
+          loadImages();
+        });
+
+        closeModal.addEventListener('click', () => {
+          imageModal.classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        imageModal.addEventListener('click', (e) => {
+          if (e.target === imageModal) {
+            imageModal.classList.add('hidden');
+          }
+        });
+
+        // Reload images button
+        if (reloadImages) {
+            reloadImages.addEventListener('click', loadImages);
+        }
+
+        // Function to load images via Ajax
+        function loadImages() {
+          imageList.innerHTML = '<div class="loading-spinner text-center py-4">Loading...</div>';
+          
+          fetch('{% url "media_image_list_json" %}')
+            .then(response => response.json())
+            .then(data => {
+              imageList.innerHTML = '';
+              
+              data.images.forEach(image => {
+                const imageCard = document.createElement('div');
+                imageCard.className = 'border rounded-md p-2 cursor-pointer hover:border-blue-500';
+                imageCard.innerHTML = `
+                  <img 
+                    src="${image.image_url}" 
+                    class="w-full h-32 object-cover rounded-md"
+                  />
+                `;
+                
+                // Add image to editor when clicked
+                imageCard.addEventListener('click', () => {
+                  const range = quill.getSelection(true);
+                  quill.insertEmbed(range.index, "image", image.image_url);
+                  quill.setSelection(range.index + 1); // Move cursor after image
+                  imageModal.classList.add('hidden');
+                  
+                  // Update hidden input after inserting image
+                  contentInput.value = quill.root.innerHTML;
+                });
+                
+                imageList.appendChild(imageCard);
+              });
+            })
+            .catch(error => {
+              imageList.innerHTML = `
+                <div class="text-red-500 text-center py-4">
+                  Error loading images. Please try again.
+                </div>
+              `;
+              console.error('Error loading images:', error);
+            });
+        }
+    }
+
+    // Handle window message from media files page
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'imageUploaded') {
+        loadImages(); // Reload images when new image is uploaded
+      }
+    });
+});
+
+ </script>
+
+{% include "web_includes/footer.html" %}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloggy Navigation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static '/font-awesome-4.7.0/font-awesome.min.css' %}">
+    <style>
+        .main_body img{width: 100% ;}
+        
+        .category {
+            overflow-x: auto;
+            /* Enables horizontal scrolling */
+            white-space: nowrap;
+            /* Ensures elements don't wrap */
+            -ms-overflow-style: none;
+            /* Hides scrollbar for IE and Edge */
+            scrollbar-width: none;
+            /* Hides scrollbar for Firefox */
+        }
+
+        .category::-webkit-scrollbar {
+            display: none;
+            /* Hides scrollbar for Chrome, Safari, and Opera */
+        }
+
+        .catContainer {
+            display: inline-flex;
+            /* Align items horizontally */
+            gap: 16px;
+            /* Space between items */
+        }
+
+        header a {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            transition: transform 0.2s ease-in-out;
+        }
+        
+
+        a:hover {
+            transform: scale(1.1);
+            /* Slight zoom effect on hover */
+        }
+    </style>
+
+
+</head>
+
+<body class="bg-gray-100">
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="text-2xl font-bold text-blue-600"><a href='/'>Bloggy</a></div>
+
+            <!-- Right Side Actions -->
+            <div class="flex items-center space-x-4">
+                <!-- Write Button -->
+                <a href="{% if request.session.user_id %}{% url 'web_blogdraft' %}{% else %}{% url 'web_log_user' %}{% endif %}" class="text-gray-600 hover:text-blue-600">
+                    <i class="fas fa-pen"></i>
+                </a>
+
+                {% if request.session.user_id %}
+                <!-- Notifications Button -->
+                <button class="text-gray-600 hover:text-blue-600" onclick="openModal()">
+                    <i class="fas fa-bell"></i>
+                </button>
+                {% endif %}
+
+
+                <!-- Search Button -->
+                <button id="searchToggle" class="text-gray-600 hover:text-blue-600">
+                    <i class="fas fa-search"></i>
+                </button>
+                {% if request.session.user_id %}
+                <!-- User Profile Dropdown -->
+                <div class="relative">
+                    <img id="profileDropdown" src="{% if users.user_profile_image and 'http' in users.user_profile_image.url %}{{ users.user_profile_image }}
+                    {% elif users.user_profile_image %}{{ users.user_profile_image.url }}
+                   {% endif %}" 
+                class="w-10 h-10 rounded-full bg-white text-white flex items-center justify-center">
+           
+
+                    <!-- Dropdown Menu -->
+                    <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-20">
+                        <ul class="py-1">
+                            <li>
+                                <a href="{% url "web_userprofile" %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i>Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                    <i class="fas fa-cog mr-2"></i>Settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url "web_logout_user" %}" class="block px-4 py-2 text-red-600 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                {% else  %}
+                <div class="relative">
+                    <button id="profileDropdown"
+                        class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center">
+                        ?
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-20">
+                        <ul class="py-1">
+                            <li>
+                                <a href="{% url "web_log_user" %}" class="block px-4 py-2 text-red-600 hover:bg-gray-100">
+                                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+
+        <!-- Search Bar (Hidden by Default) -->
+        <div id="searchBar" class="hidden container mx-auto px-4 pb-3">
+            <form class="flex" onsubmit="return false;">
+                {% csrf_token %}
+                <input type="text" maxlength="150" placeholder="Search Bloggy..."
+                    class="flex-grow px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+            <ul class="overflow-y-auto h-full my-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 auto-rows-max">
+                    <!-- AJAX results will appear here -->
+                </div>
+            </ul>
+        </div>
+        
+        <script>
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            document.querySelector('input[type="text"]').addEventListener('input', function (e) {
+                const query = e.target.value;
+                const resultsContainer = document.querySelector('.grid');
+            
+                if (query.length > 0) {
+                    fetch(`/live-search/?query=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            resultsContainer.innerHTML = ''; // Clear previous results
+                            data.results.forEach(post => {
+                                resultsContainer.innerHTML += `
+                                    <a href="/${post.post_category__catSlug}/${post.post_slug}">
+                                        <li class="shadow-md m-1 p-3 flex rounded-lg hover:bg-gray-100 hover:text-blue-600">
+                                            <img class="w-52 h-full inset-0 object-cover rounded-lg" src="/media/${post.post_cover}" alt="">
+                                            <div class="p-2 flex items-center h-100">
+                                                <h3 class="font-bold">${post.post_title}</h3>
+                                            </div>
+                                        </li>
+                                    </a>
+                                `;
+                            });
+                        });
+                } else {
+                    resultsContainer.innerHTML = ''; // Clear results if the query is empty
+                }
+            });
+            </script>
+            
+    </header>
+
+    <!-- MODAL  -->
+    <div id="modal" class=" z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white w-full max-w-[500px] h-full max-h-[600px] rounded-lg shadow-lg p-6 relative">
+            <!-- Close Button -->
+            <button class="absolute top-4 right-4 text-gray-600 hover:text-gray-900" onclick="closeModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Modal Content -->
+            <h2 class="text-2xl font-bold mb-4">Notifications</h2>
+            <p class="text-gray-700">
+                This is your popup content. You can customize it as needed.
+            </p>
+        </div>
+    </div>
+
+    <div class="container mx-auto">
+        <!-- CATEGORY -->
+        <div class="category my-3 px-4">
+            <div class="catContainer flex justify-start items-center gap-4">
+                {% for cat in categories %}
+                <a href="{% url 'web_category' cat.catSlug %}" class="p-2 m-2 bg-white rounded-full hover:shadow-md flex items-center gap-2" style="color: {{cat.catColor}};">
+                    <i class="{{cat.catIcon}}"></i>
+                    <span>{{cat.catName}}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <script>    
+            {% if messages %}
+            {% for message in messages %}
+                alert("{{ message }}");
+            {% endfor %}
+        {% endif %}</script>

@@ -1,0 +1,58 @@
+<div>
+  <h3 class="text-lg font-semibold mb-2">Already Uploaded Images</h3>
+  <div id="imageList" class="grid grid-cols-3 gap-2">
+    <!-- Images will be dynamically added here -->
+  </div>
+</div>
+
+<script>
+  const imageList = document.getElementById('imageList');
+
+  let uploadedImages = [];
+
+  async function fetchImageLinks() {
+    try {
+      const response = await fetch('/profile/media-files/json');
+
+      // Check if the response is OK
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      // Parse the JSON response
+      const data = await response.json();
+
+      // Check if there are images in the response
+      if (data && data.images) {
+        const newImages = data.images.map(image => image.image_url); // Extract image URLs from JSON
+        uploadedImages = [...uploadedImages, ...newImages]; // Merge the initial array with new URLs
+
+        // Render images to the DOM
+        renderImages();
+      } else {
+        console.error('No images found in response');
+      }
+    } catch (error) {
+      console.error('Error fetching image links:', error);
+    }
+  }
+
+  function renderImages() {
+    // Clear the current images
+    imageList.innerHTML = '';
+
+    // Add each image to the DOM
+    uploadedImages.forEach(imageUrl => {
+      const imgElement = document.createElement('img');
+      imgElement.src = imageUrl; // Set the image source
+      imgElement.alt = 'Uploaded Image'; // Set alt text for accessibility
+      imgElement.className = 'w-full h-auto object-cover rounded shadow'; // Add classes for styling
+
+      // Append the image element to the container
+      imageList.appendChild(imgElement);
+    });
+  }
+
+  // Fetch and display images when the page loads
+  fetchImageLinks();
+</script>

@@ -1,0 +1,86 @@
+
+</div>
+
+<script>
+    // NAVIGATIONBAR  
+
+    // Profile Dropdown Toggle
+    const profileDropdown = document.getElementById('profileDropdown');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    profileDropdown.addEventListener('click', () => {
+        dropdownMenu.classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (event) => {
+        if (!profileDropdown.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+
+    // Search Bar Toggle
+    const searchToggle = document.getElementById('searchToggle');
+    const searchBar = document.getElementById('searchBar');
+
+    searchToggle.addEventListener('click', () => {
+        searchBar.classList.toggle('hidden');
+    });
+    // Open Modal
+    function openModal() {
+        document.getElementById('modal').classList.remove('hidden');
+    }
+
+    // Close Modal
+    function closeModal() {
+        document.getElementById('modal').classList.add('hidden');
+    }
+
+    // CATEGORY 
+
+    const categoryContainer = document.querySelector('.category');
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    categoryContainer.addEventListener('mousedown', (e) => {
+        isDown = true;
+        categoryContainer.classList.add('active');
+        startX = e.pageX - categoryContainer.offsetLeft;
+        scrollLeft = categoryContainer.scrollLeft;
+    });
+
+    categoryContainer.addEventListener('mouseleave', () => {
+        isDown = false;
+        categoryContainer.classList.remove('active');
+    });
+
+    categoryContainer.addEventListener('mouseup', () => {
+        isDown = false;
+        categoryContainer.classList.remove('active');
+    });
+
+    categoryContainer.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - categoryContainer.offsetLeft;
+        const walk = (x - startX) * 3; // Scroll-fast multiplier
+        categoryContainer.scrollLeft = scrollLeft - walk;
+    });
+
+    // For touch devices
+    categoryContainer.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].pageX - categoryContainer.offsetLeft;
+        scrollLeft = categoryContainer.scrollLeft;
+    });
+
+    categoryContainer.addEventListener('touchmove', (e) => {
+        const x = e.touches[0].pageX - categoryContainer.offsetLeft;
+        const walk = (x - startX) * 2; // Scroll multiplier
+        categoryContainer.scrollLeft = scrollLeft - walk;
+    });
+</script>
+</body>
+
+</html>

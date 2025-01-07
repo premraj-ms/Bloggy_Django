@@ -1,0 +1,22 @@
+{% extends 'includes/main.html' %}
+
+{% block content %}
+{% if message %}
+  <div class="content-wrapper">
+    <div class="container-xxl flex-grow-1 container-p-y">
+
+        <div class="{{mesType}} p-3">
+            <h1>{{message}}</h1>
+        </div>
+
+        <script>
+            $(document).ready(function() {
+                // Redirect after 3 seconds (3000 milliseconds)
+                setTimeout(function() {
+                    window.location.href = "{{redir}}"; // Replace with your target URL
+                }, 3000);
+            });
+        </script>
+    </div>
+  </div>{% endif %}
+{% endblock %}

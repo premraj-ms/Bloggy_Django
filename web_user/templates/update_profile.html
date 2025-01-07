@@ -1,0 +1,54 @@
+{% include "web_includes/header.html" %}
+<div class="min-h-screen bg-gray-100 p-6">
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold mb-4">User Information Form</h2>
+            <form action="{% url "user_save_user_details" %}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                
+                {% csrf_token %}
+                <!-- Full Name -->
+                <div class="p-2">
+                    <label for="full_name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" name="full_name" id="full_name" 
+                        class="mt-1 block w-full p-2 m-2 bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                       value="{{users.full_name}}" placeholder="Enter full name" required>
+                </div>
+
+            
+                <!-- Bio -->
+                <div class="p-2">
+                    <label for="user_bio" class="block text-sm font-medium text-gray-700">Bio</label>
+                    <input type="text" name="user_bio" id="user_bio"  maxlength="150"
+                        class="mt-1 block w-full p-2 m-2 bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                        value="{{users.user_bio}}" placeholder="Tell us about yourself">
+                </div>
+
+                <!-- Profile Image -->
+                <div class="p-2" maxlength="500">
+                    <label for="user_profile_image" class="block text-sm font-medium text-gray-700">Profile Image</label>
+                    <input type="file" name="user_profile_image" id="user_profile_image" 
+                        class="mt-1 block w-full p-2 m-2 bg-gray-100 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                </div>
+
+                <!-- About -->
+                <div class="p-2">
+                    <label for="user_about" class="block text-sm font-medium text-gray-700">About</label>
+                    <textarea name="user_about" id="user_about" rows="4" 
+                        class="mt-1 block w-full p-2 m-2 bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                        placeholder="Write about yourself"> {{users.user_about}}</textarea>
+                </div>    
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit" 
+                        class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% include "web_includes/footer.html" %}
