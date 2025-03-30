@@ -136,15 +136,3 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Google OAuth Credentials
-# GOOGLE_CLIENT_ID = ""
-# GOOGLE_CLIENT_SECRET = ""
-# GOOGLE_REDIRECT_URI = ""
-# LOGIN_REDIRECT_URL = "/"  # Redirect after login
-
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = ''  
-# EMAIL_HOST_PASSWORD = '' 
