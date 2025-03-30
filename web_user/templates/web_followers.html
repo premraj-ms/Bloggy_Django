@@ -1,0 +1,21 @@
+{% include 'web_includes/header.html' %}
+<div class="p-6 bg-gray-100 min-h-screen">
+  <h1 class="text-2xl font-bold mb-6">Users You Are Following</h1>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% for userf in followed_users %}
+          <div class="bg-white p-4 rounded-2xl shadow-lg flex flex-col items-center">
+             <a href="/user/{{userf.user_name}}"><img class="w-24 h-24 rounded-full border-4 border-gray-200"
+              src="{% if userf.user_profile_image and 'http' in userf.user_profile_image.url %}
+                {{ userf.user_profile_image }}
+              {% elif userf.user_profile_image %}
+                {{ userf.user_profile_image.url }}
+              {% endif %}"
+              alt="Profile Picture" /></a>
+              <h3 class="mt-4 text-lg font-semibold text-gray-800">{{ userf.full_name }}</h3>
+              <p class="mt-1 text-sm text-gray-500">{{ userf.user_name }}</p>
+          </div>
+      {% endfor %}
+  </div>
+</div>
+
+{% include 'web_includes/footer.html' %}

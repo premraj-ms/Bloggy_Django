@@ -40,8 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'admin_box',
     'web_user',
+    "django.contrib.sites",
+    "django.contrib.sitemaps",
 
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -132,13 +136,15 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# GOOGLE AUTHENTICATION
-# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '170529765906-gl5dtc1dmefh8oj6e6f54csgi0qt8em3.apps.googleusercontent.com'
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
-# SOCIAL_AUTH_URL_NAMESPACE = 'social'
-
 # Google OAuth Credentials
-GOOGLE_CLIENT_ID = "170529765906-gl5dtc1dmefh8oj6e6f54csgi0qt8em3.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
-GOOGLE_REDIRECT_URI = "http://127.0.0.1:8000/google/callback/"
+GOOGLE_CLIENT_ID = ""
+GOOGLE_CLIENT_SECRET = ""
+GOOGLE_REDIRECT_URI = ""
 LOGIN_REDIRECT_URL = "/"  # Redirect after login
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = ''  
+EMAIL_HOST_PASSWORD = '' 

@@ -5,7 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bloggy Navigation</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'ad_inc' %}/assets/img/favicon/favicon.ico" />
+    {{metadetails|safe}}
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static '/font-awesome-4.7.0/font-awesome.min.css' %}">
@@ -44,12 +46,77 @@
         
 
         a:hover {
-            transform: scale(1.1);
+            transform: scale(1.03);
+            
             /* Slight zoom effect on hover */
         }
-    </style>
+        .main_body h1, .main_body h2, .main_body h3, .main_body h4, .main_body h5, .main_body h6 {
+            font-weight: bold;
+            color: #1F2937; /* Gray 800 */
+            line-height: 1.5; /* Leading-tight */
+        }
+        
+        .main_body h1 {
+            font-size: 2.25rem; /* Text-4xl */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        
+        .main_body h2 {
+            font-size: 1.875rem; /* Text-3xl */
+            margin-bottom: 0.75rem; /* mb-3 */
+        }
+        
+        .main_body h3 {
+            font-size: 1.5rem; /* Text-2xl */
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+        
+        /* Paragraph */
+        .main_body p {
+            font-size: 1rem; /* Text-base */
+            color: #4B5563; /* Gray 600 */
+            margin-bottom: 1rem; /* mb-4 */
+            line-height: 1.625; /* Leading-relaxed */
+        }
+        
+        /* Links */
+        .main_body a {
+            color: #2563EB !important; /* Blue 600 */
+            text-decoration: underline;
+        }
+        
+        .main_body a:hover {
+            color: #1E40AF; /* Blue 800 */
+        }
+        
+        /* Lists */
+        .main_body ul, .main_body ol {
+            padding-left: 1.25rem; /* pl-5 */
+            margin-bottom: 1rem; /* mb-4 */
+            list-style-type: disc; /* List-disc */
+        }
+        
+        .main_body ol {
+            list-style-type: decimal; /* List-decimal */
+        }
+        
+        .main_body li {
+            margin-bottom: 0.5rem; /* mb-2 */
+            color: #4B5563; /* Gray 600 */
+        }
+        
+        /* Blockquote */
+        .main_body blockquote {
+            border-left: 4px solid #2563EB; /* Border-l-4, Blue 500 */
+            padding-left: 1rem; /* pl-4 */
+            font-style: italic;
+            color: #374151; /* Gray 700 */
+        }
+        
+</style>
 
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -80,8 +147,8 @@
                 {% if request.session.user_id %}
                 <!-- User Profile Dropdown -->
                 <div class="relative">
-                    <img id="profileDropdown" src="{% if users.user_profile_image and 'http' in users.user_profile_image.url %}{{ users.user_profile_image }}
-                    {% elif users.user_profile_image %}{{ users.user_profile_image.url }}
+                    <img id="profileDropdown" alt="profile" src="{% if usersj.user_profile_image and 'http' in usersj.user_profile_image.url %}{{ usersj.user_profile_image }}
+                    {% elif usersj.user_profile_image %}{{ usersj.user_profile_image.url }}
                    {% endif %}" 
                 class="w-10 h-10 rounded-full bg-white text-white flex items-center justify-center">
            
@@ -92,11 +159,6 @@
                             <li>
                                 <a href="{% url "web_userprofile" %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
                                     <i class="fas fa-user mr-2"></i>Profile
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
-                                    <i class="fas fa-cog mr-2"></i>Settings
                                 </a>
                             </li>
                             <li>
@@ -178,9 +240,8 @@
             
     </header>
 
-    <!-- MODAL  -->
-    <div id="modal" class=" z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white w-full max-w-[500px] h-full max-h-[600px] rounded-lg shadow-lg p-6 relative">
+    <div id="modal" class="z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white w-full max-w-[500px] h-full max-h-[600px] rounded-lg shadow-lg p-6 relative overflow-y-auto">
             <!-- Close Button -->
             <button class="absolute top-4 right-4 text-gray-600 hover:text-gray-900" onclick="closeModal()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -188,14 +249,18 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-
-            <!-- Modal Content -->
+    
+            <!-- Modal Title -->
             <h2 class="text-2xl font-bold mb-4">Notifications</h2>
-            <p class="text-gray-700">
-                This is your popup content. You can customize it as needed.
-            </p>
+    
+            <!-- Notifications Container -->
+            <ul class="space-y-4">
+                
+            </ul>
         </div>
     </div>
+    
+    
 
     <div class="container mx-auto">
         <!-- CATEGORY -->
@@ -209,9 +274,59 @@
                 {% endfor %}
             </div>
         </div>
-        <script>    
-            {% if messages %}
-            {% for message in messages %}
-                alert("{{ message }}");
-            {% endfor %}
-        {% endif %}</script>
+        {% if messages %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                {% for message in messages %}
+                    Swal.fire({
+                        icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'info' %}info{% else %}warning{% endif %}",
+                        title: "{{ message|escapejs }}",
+                        showConfirmButton: true,
+                        timer: 3000
+                    });
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
+    <script>
+        let isModalOpen = false;  // Track if the modal is already open
+    
+        // Function to fetch notifications and show modal
+        function fetchNotifications() {
+            fetch('/fetch-notifications/')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationsContainer = document.querySelector('#modal ul');
+                    notificationsContainer.innerHTML = ''; // Clear previous notifications
+    
+                    // Append new notifications
+                    data.notifications.forEach(notification => {
+                        const li = document.createElement('li');
+                        li.className = 'p-4 bg-gray-50 border-l-4 border-blue-500 shadow-md rounded';
+                        li.innerHTML = `
+                            <div class="flex items-start">
+                                <img src="${notification.profile_image}" alt="User Profile" 
+                                     class="w-10 h-10 rounded-full mr-4">
+                                <a href="/user/${notification.userSlug}">
+                                    <p class="font-semibold text-lg">${notification.message}</p>
+                                    <p class="text-gray-500 text-sm">${notification.created_at}</p>
+                                </a>
+                            </div>
+                        `;
+                        notificationsContainer.appendChild(li);
+                    });
+    
+                    
+                })
+                .catch(error => {
+                    console.error('Error fetching notifications:', error);
+                });
+        }
+    
+        // Fetch notifications every 7 seconds after the page loads
+        setInterval(fetchNotifications, 7000);
+    
+
+    </script>
+    
+    

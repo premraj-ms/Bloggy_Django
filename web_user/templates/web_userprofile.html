@@ -9,41 +9,39 @@
                     <!-- Profile Picture Section -->
                     <div class="bg-blue-500 flex-shrink-0 flex items-center justify-center md:w-1/3">
                         <img  class="rounded-full bg-white w-40 h-40 md:w-48 md:h-48 object-cover border-4 border-white shadow-lg"
-                            src="{% if users.user_profile_image and 'http' in users.user_profile_image.url %}{{ users.user_profile_image }}
-                    {% elif users.user_profile_image %}{{ users.user_profile_image.url }}
+                            src="{% if usersj.user_profile_image and 'http' in usersj.user_profile_image.url %}{{ usersj.user_profile_image }}
+                    {% elif usersj.user_profile_image %}{{ usersj.user_profile_image.url }}
                    {% endif %}"  alt="Profile Picture" />
                     </div>
 
                     <!-- User Info Section -->
                     <div class="p-6 md:w-2/3">
                         <h2 class="text-2xl font-semibold text-gray-800">
-                            {{users.full_name}}
+                            {{usersj.full_name}}
                         </h2>
-                        <p class="text-gray-600 text-sm">{{users.user_name}}</p>
+                        <p class="text-gray-600 text-sm">{{usersj.user_name}}</p>
                         <p class="mt-4 text-gray-700">
-                            {{users.user_bio}}
+                            {{usersj.user_bio}}
                         </p>
 
                         <!-- User Stats -->
                         <div class="mt-6 flex space-x-6">
                             <div class="text-center">
-                                <h3 class="text-xl font-semibold text-gray-800">120</h3>
-                                <p class="text-sm text-gray-600">Posts</p>
+                              <h3 class="text-xl font-semibold text-gray-800">{{post_count}}</h3>
+                              <p class="text-sm text-gray-600">Posts</p>
                             </div>
                             <div class="text-center">
-                                <h3 class="text-xl font-semibold text-gray-800">500</h3>
-                                <p class="text-sm text-gray-600">Followers</p>
+                              <h3 class="text-xl font-semibold text-gray-800">{{followers_count}}</h3>
+                              <p class="text-sm text-gray-600">Followers</p>
                             </div>
                             <div class="text-center">
-                                <h3 class="text-xl font-semibold text-gray-800">180</h3>
-                                <p class="text-sm text-gray-600">Following</p>
+                              <h3 class="text-xl font-semibold text-gray-800"><a href="{% url "following" %}">{{following_count}}</a></h3>
+                              <p class="text-sm text-gray-600">Following</p>
                             </div>
-                        </div>
+                          </div>
 
                         <!-- Social Links -->
                         <div class="mt-6">
-                            <a href="#"
-                                class="inline-block bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-lg mr-2">Manage Posts</a>
                             <a href="{% url "web_user_edit" %}"
                                 class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm px-4 py-2 rounded-lg">Edit Profile</a>
                         </div>
@@ -54,12 +52,12 @@
 
             <div class="max-w-4xl mx-auto mt-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {% if users.user_about  %}
+                    {% if usersj.user_about  %}
                     <!-- About Section -->
                     <div class="bg-white shadow-lg rounded-lg p-6">
                         <h3 class="text-xl font-semibold text-gray-800">About</h3>
                         <p class="mt-4 text-gray-700">
-                            {{users.user_about}}
+                            {{usersj.user_about}}
                         </p>
                     </div>
                     {% endif %}
@@ -67,19 +65,13 @@
                     <div class="bg-white shadow-lg rounded-lg p-6">
                         <h3 class="text-xl font-semibold text-gray-800">Contribution</h3>
                         <ul class="mt-4 space-y-2">
+                            {% for contribution in contributions %}
                             <li class="flex items-center">
-                                <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                                JavaScript (React, Node.js)
+                              <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                              <b>{{contribution}}</b>
                             </li>
-                            <li class="flex items-center">
-                                <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                                Python (Django, Flask)
-                            </li>
-                            <li class="flex items-center">
-                                <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                                Cloud Computing (AWS, Azure)
-                            </li>
-                        </ul>
+                            {% endfor %}
+                          </ul>
                     </div>
                 </div>
             </div>

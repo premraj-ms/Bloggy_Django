@@ -5,7 +5,7 @@ def global_header_data(request):
     if ('user_id' in request.session):
         userId = request.session['user_id']
         users = Web_users.objects.get(id = userId)
-        return {'categories': categories, "users":users}
+        return {'categories': categories, "usersj":users}
 
     return {'categories': categories}
 

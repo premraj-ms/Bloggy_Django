@@ -23,27 +23,89 @@
         <!-- User Stats -->
         <div class="mt-6 flex space-x-6">
           <div class="text-center">
-            <h3 class="text-xl font-semibold text-gray-800">120</h3>
+            <h3 class="text-xl font-semibold text-gray-800">{{post_count}}</h3>
             <p class="text-sm text-gray-600">Posts</p>
           </div>
           <div class="text-center">
-            <h3 class="text-xl font-semibold text-gray-800">500</h3>
+            <h3 class="text-xl font-semibold text-gray-800">{{followers_count}}</h3>
             <p class="text-sm text-gray-600">Followers</p>
           </div>
           <div class="text-center">
-            <h3 class="text-xl font-semibold text-gray-800">180</h3>
+            <h3 class="text-xl font-semibold text-gray-800">{{following_count}}</h3>
             <p class="text-sm text-gray-600">Following</p>
           </div>
         </div>
 
         <!-- Social Links -->
         <div class="mt-6">
-          <a href="#" class="inline-block bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-lg mr-2">Manage Posts</a>
-          <a href="{% url 'web_user_edit' %}" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm px-4 py-2 rounded-lg">Edit Profile</a>
+          <form method="POST" action="#" id="follow-form" class="inline-block">
+            {% csrf_token %}
+            <button 
+                type="button" 
+                class="follow-btn bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-lg mr-2" 
+                data-user-id="{{ users.id }}">
+                {% if is_following %}
+                  Following
+                {% else %}
+                  Follow
+                {% endif %}
+            </button>
+        </form>
+          {% comment %} <a href="{% url 'web_user_edit' %}" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm px-4 py-2 rounded-lg">Edit Profile</a> {% endcomment %}
         </div>
       </div>
     </div>
   </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const followButton = document.querySelector(".follow-btn");
+  
+      followButton.addEventListener("click", function () {
+          const userId = followButton.dataset.userId;
+          const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+  
+          fetch(`/follow-toggle/${userId}/`, {
+              method: "POST",
+              headers: {
+                  "X-CSRFToken": csrfToken,
+                  "Content-Type": "application/json",
+              },
+          })
+              .then((response) => response.json())
+              .then((data) => {
+                  if (data.status === "followed") {
+                      followButton.textContent = "Following";
+                      followButton.classList.add("bg-green-500", "hover:bg-green-600");
+                      followButton.classList.remove("bg-blue-500", "hover:bg-blue-600");
+                  } else if (data.status === "unfollowed") {
+                      followButton.textContent = "Follow";
+                      followButton.classList.add("bg-blue-500", "hover:bg-blue-600");
+                      followButton.classList.remove("bg-green-500", "hover:bg-green-600");
+                  }
+  
+                  if (data.message) {
+
+                    Swal.fire({
+                      icon: data.stat,
+                      title: data.message,
+                      showConfirmButton: true,
+                      timer: 3000
+                  });
+
+                  }
+              })
+              .catch((error) => {
+                  console.error("Error:", error);
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                  });
+              });
+      });
+  });
+  
+  </script>
 
   <div class="max-w-4xl mx-auto mt-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -58,18 +120,12 @@
       <div class="bg-white shadow-lg rounded-lg p-6">
         <h3 class="text-xl font-semibold text-gray-800">Contribution</h3>
         <ul class="mt-4 space-y-2">
+          {% for contribution in contributions %}
           <li class="flex items-center">
             <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            JavaScript (React, Node.js)
+            <b>{{contribution}}</b>
           </li>
-          <li class="flex items-center">
-            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            Python (Django, Flask)
-          </li>
-          <li class="flex items-center">
-            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            Cloud Computing (AWS, Azure)
-          </li>
+          {% endfor %}
         </ul>
       </div>
     </div>

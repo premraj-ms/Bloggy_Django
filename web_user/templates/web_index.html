@@ -1,49 +1,37 @@
-{% include "web_includes/header.html" %}
+{% include 'web_includes/header.html' %}
 
 <!-- FEATURED POST -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
   <!-- Main Featured Post -->
   <div class="relative col-span-1 lg:col-span-2 bg-gray-800 rounded-lg overflow-hidden">
-    <img src="https://via.placeholder.com/500x400" alt="Featured Image" class="w-full h-full object-cover" />
-    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-    <div class="absolute bottom-4 left-4 text-white space-y-2">
-      <span class="bg-blue-500 text-sm px-3 py-1 rounded-full uppercase">Health</span>
-      <h2 class="text-2xl font-bold">What We Think, We Become</h2>
-      <p class="text-sm">
-        <span>Sora Blogging Tips</span> - February 25, 2023
-      </p>
-    </div>
+    <a href="/{{ featured_post.post_category.catSlug }}/{{ featured_post.post_slug }}">
+      <img src="{{ featured_post.post_cover.url }}" alt="Featured Image" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+      <div class="absolute bottom-4 left-4 text-white space-y-2">
+        <span style="background-color: {{ featured_post.post_category.catColor }};" class="bg-blue-500 text-sm px-3 py-1 rounded-full uppercase">{{ featured_post.post_category.catName }}</span>
+        <h2 class="text-2xl font-bold">{{ featured_post.post_title }}</h2>
+        <p class="text-sm">
+          <span>{{ featured_post.post_author.full_name }}</span> - {{ featured_post.created_at|date:'F d, Y' }}
+        </p>
+      </div>
+    </a>
   </div>
 
   <!-- Smaller Posts -->
   <div class="grid grid-cols-1 gap-4">
-    <div class="relative bg-gray-800 rounded-lg overflow-hidden">
-      <img src="https://via.placeholder.com/300x200" alt="Post Image" class="w-full h-full object-cover" />
-      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-      <div class="absolute bottom-4 left-4 text-white space-y-2">
-        <span class="bg-blue-500 text-sm px-3 py-1 rounded-full uppercase">Health</span>
-        <h3 class="text-lg font-semibold">Good Things Come in Good Time</h3>
-        <p class="text-sm">March 17, 2017</p>
-      </div>
-    </div>
-    <div class="relative bg-gray-800 rounded-lg overflow-hidden">
-      <img src="https://via.placeholder.com/300x200" alt="Post Image" class="w-full h-full object-cover" />
-      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-      <div class="absolute bottom-4 left-4 text-white space-y-2">
-        <span class="bg-purple-500 text-sm px-3 py-1 rounded-full uppercase">Lifestyle</span>
-        <h3 class="text-lg font-semibold">Luck is Not a Business Model</h3>
-        <p class="text-sm">March 17, 2017</p>
-      </div>
-    </div>
-    <div class="relative bg-gray-800 rounded-lg overflow-hidden">
-      <img src="https://via.placeholder.com/300x200" alt="Post Image" class="w-full h-full object-cover" />
-      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-      <div class="absolute bottom-4 left-4 text-white space-y-2">
-        <span class="bg-green-500 text-sm px-3 py-1 rounded-full uppercase">Music</span>
-        <h3 class="text-lg font-semibold">Pain is Never Permanent</h3>
-        <p class="text-sm">March 17, 2016</p>
-      </div>
-    </div>
+    {% for feat in other_posts %}
+      <a href="/{{ feat.post_category.catSlug }}/{{ feat.post_slug }}">
+        <div class="relative bg-gray-800 rounded-lg overflow-hidden">
+          <img src="{{ feat.post_cover.url }}" alt="Post Image" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+          <div class="absolute bottom-4 left-4 text-white space-y-2">
+            <span style="background-color: {{ feat.post_category.catColor }};" class="text-sm px-3 py-1 rounded-full uppercase">{{ feat.post_category.catName }}</span>
+            <h3 class="text-lg font-semibold">{{ feat.post_title }}</h3>
+            <span>{{ feat.post_author.full_name }}</span> - {{ feat.created_at|date:'F d, Y' }}
+          </div>
+        </div>
+      </a>
+    {% endfor %}
   </div>
 </div>
 
@@ -55,75 +43,89 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <!-- Single Blog Post -->
       {% for post in posts %}
-      <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
-        <!-- Cover Image -->
-        {% if post.post_cover %}
-        <a href="{% url "web_post" post.post_category.catSlug post.post_slug %}" >
-          <img src="{{ post.post_cover.url }}" alt="{{ post.post_title }}" class="w-full h-48 object-cover">
-        </a> {% endif %}
-        
-        <!-- Content Section -->
-        <div class="p-6">
-          <span style="background-color: {{post.post_category.catColor}};" class="inline-block px-3 py-1 text-xs font-semibold text-white  rounded-full">
-          {{post.post_category.catName}}
-        </span>
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+          <!-- Cover Image -->
+          {% if post.post_cover %}
+            <a href="{% url 'web_post' post.post_category.catSlug post.post_slug %}"><img src="{{ post.post_cover.url }}" alt="{{ post.post_title }}" class="w-full h-48 object-cover" /></a>
+          {% endif %}
+
+          <!-- Content Section -->
+          <div class="p-6">
+            <span style="background-color: {{ post.post_category.catColor }};" class="inline-block px-3 py-1 text-xs font-semibold text-white rounded-full">{{ post.post_category.catName }}</span>
             <!-- Blog Title -->
-            <h2 class="text-xl font-bold text-gray-800">
-            <a href="{% url "web_post" post.post_category.catSlug post.post_slug %}">
-              {{ post.post_title }}
-            </a>
-            </h2>
-            
+            <h2 class="text-xl font-bold text-gray-800"><a href="{% url 'web_post' post.post_category.catSlug post.post_slug %}">{{ post.post_title }}</a></h2>
+
             <!-- Author and Date -->
             <div class="flex items-center mt-4">
-              <a href="{% url 'user_page'  post.post_author.user_name %}"> <img src="{% if post.post_author.user_profile_image and 'http' in post.post_author.user_profile_image.url %}
-                {{ post.post_author.user_profile_image }}
-              {% elif post.post_author.user_profile_image %}
-                {{ post.post_author.user_profile_image.url }}
-              {% endif %}" alt="{{ post.post_author.full_name }}" class="w-10 h-10 rounded-full object-cover"></a>                <div class="ml-3">
-                  <a href="{% url 'user_page'  post.post_author.user_name %}"><p class="text-sm font-medium text-gray-800">{{ post.post_author.full_name }}</p></a>
-                    <p class="text-sm text-gray-500">Published on {{ post.post_author.created_at|date:"M d, Y" }}</p>
-                </div>
+              <a href="{% url 'user_page' post.post_author.user_name %}">
+                <img src="{% if post.post_author.user_profile_image and 'http' in post.post_author.user_profile_image.url %}
+                    {{ post.post_author.user_profile_image }}
+                  {% elif post.post_author.user_profile_image %}
+                    {{ post.post_author.user_profile_image.url }}
+                  {% endif %}"
+                  alt="{{ post.post_author.full_name }}"
+                  class="w-10 h-10 rounded-full object-cover" />
+              </a>
+              <div class="ml-3">
+                <a href="{% url 'user_page' post.post_author.user_name %}"><p class="text-sm font-medium text-gray-800">{{ post.post_author.full_name }}</p></a>
+                <p class="text-sm text-gray-500">Published on {{ post.post_author.created_at|date:'M d, Y' }}</p>
+              </div>
             </div>
-            
+
             <!-- Blog Description -->
             {% if post.post_desc %}
-            <p class="text-gray-600 mt-2">
-                {{ post.post_desc }}
-            </p>
+              <p class="text-gray-600 mt-2">{{ post.post_desc }}</p>
             {% endif %}
-            
+
             <!-- Meta Information -->
             <div class="flex items-center justify-between mt-4 text-gray-600">
-                <!-- Comment Icon with Number -->
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 16.054A9.936 9.936 0 0021.957 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5.523 4.477 10 10 10 2.191 0 4.208-.703 5.854-1.895l4.444.49a1 1 0 001.102-1.102l-.49-4.444z"></path>
-                    </svg>
-                    <span class="ml-1 text-sm">{{ post.comment_count }} Comments</span>
-                </div>
-                
-                <!-- Eye Icon with View Count -->
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm-3-9C5.373 3 1 8.477 1 12s4.373 9 9 9 9-4.477 9-9-4.373-9-9-9z"></path>
-                    </svg>
-                    <span class="ml-1 text-sm">{{post.view_count}} Views</span>
-                </div>
+              <!-- Comment Icon with Number -->
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 16.054A9.936 9.936 0 0021.957 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5.523 4.477 10 10 10 2.191 0 4.208-.703 5.854-1.895l4.444.49a1 1 0 001.102-1.102l-.49-4.444z"></path>
+                </svg>
+                <span class="ml-1 text-sm">{{ post.comment_count }} Comments</span>
+              </div>
+
+              <!-- Eye Icon with View Count -->
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm-3-9C5.373 3 1 8.477 1 12s4.373 9 9 9 9-4.477 9-9-4.373-9-9-9z"></path>
+                </svg>
+                <span class="ml-1 text-sm">{{ post.view_count }} Views</span>
+              </div>
             </div>
-            
+
             <!-- Read More Link -->
-            <a href="{% url "web_post" post.post_category.catSlug post.post_slug %}" class="inline-block mt-4 text-blue-500 hover:underline font-semibold">
-              Read More →
-          </a>
+            <a href="{% url 'web_post' post.post_category.catSlug post.post_slug %}" class="inline-block mt-4 text-blue-500 hover:underline font-semibold">Read More →</a>
+          </div>
         </div>
-    </div>
       {% endfor %}
       <!-- Add more blog posts as needed -->
     </div>
-
-
   </div>
-</div>
 
-{% include "web_includes/footer.html" %}
+</div>
+{% if followed_users is not False %}
+  <div class="p-6 bg-gray-100 min-h-screen">
+    <h2 class="text-4xl font-bold text-gray-800 text-center mb-8">Users You Are Following</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% for userf in followed_users %}
+        <div class="bg-white p-4 rounded-2xl shadow-lg flex flex-col items-center">
+          <a href="/user/{{ userf.user_name }}">
+            <img class="w-24 h-24 rounded-full border-4 border-gray-200"
+              src="{% if userf.user_profile_image and 'http' in userf.user_profile_image.url %}
+                {{ userf.user_profile_image }}
+              {% elif userf.user_profile_image %}
+                {{ userf.user_profile_image.url }}
+              {% endif %}"
+              alt="Profile Picture" />
+          </a>
+          <h3 class="mt-4 text-lg font-semibold text-gray-800">{{ userf.full_name }}</h3>
+          <p class="mt-1 text-sm text-gray-500">{{ userf.user_name }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+{% include 'web_includes/footer.html' %}

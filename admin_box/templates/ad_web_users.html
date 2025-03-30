@@ -1,0 +1,92 @@
+{% extends 'includes/main.html' %}
+{% block content %}
+  <div class="content-wrapper">
+    <!-- Content -->
+
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <h2>Users list</h2>
+      <div class="card">
+        <div class="table-responsive text-nowrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Profile</th>
+                <th>Posts</th>
+                <th>Created on</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+              {% for i in users %}
+                <tr>
+                  <td>
+                    <i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{ i.user.full_name }}</strong>
+                  </td>
+                  <td>
+                    <a href="/user/{{ i.user.user_name }}">{{ i.user.user_name }}</a>
+                  </td>
+                  <td>{{ i.user.user_email }}</td>
+                  <td>
+                    <img src="{% if i.user.user_profile_image and 'http' in i.user.user_profile_image.url %}
+                        {{ i.user.user_profile_image }}
+                      {% elif i.user.user_profile_image %}
+                        {{ i.user.user_profile_image.url }}
+                      {% endif %}"
+                      alt="Commenter Avatar"
+                      width="50"
+                      height="50"
+                      class="rounded-circle"
+                      style="object-fit: cover;" />
+                  </td>
+                  <td>{{ i.post_count }}</td>
+
+                  <td>{{ i.user.created_at }}</td>
+                  <td>
+                    <div class="dropdown">
+                      <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
+                      <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'delUser' i.user.id %}" onclick="return confirm('Deleting users will affect the posts created by him')"><i class="bx bx-trash me-1"></i> Delete</a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <!-- Bootstrap Pagination (Centered) -->
+          <div class="d-flex justify-content-center mt-3">
+            <nav>
+                <ul class="pagination">
+                    {% if users.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ users.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+        
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Page {{ users.number }} of {{ users.paginator.num_pages }}
+                        </span>
+                    </li>
+        
+                    {% if users.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ users.next_page_number }}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ users.paginator.num_pages }}">Last</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav></div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

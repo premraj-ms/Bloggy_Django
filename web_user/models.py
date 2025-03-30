@@ -26,7 +26,7 @@ class Web_post(models.Model):
     post_title = models.CharField(max_length=80, blank=True, default="untitled")
     post_author = models.ForeignKey(Web_users, on_delete=models.CASCADE, related_name="posts")
     post_category = models.ForeignKey(Categories, on_delete=models.CASCADE, related_name="posts")
-    post_desc = models.CharField(max_length=160, null=True, blank=True)
+    post_desc = models.CharField(max_length=250, null=True, blank=True)
     post_cover = models.ImageField(upload_to="Post_cover")
     post_content = models.TextField()
     post_published = models.BooleanField(default=0)
@@ -35,6 +35,10 @@ class Web_post(models.Model):
     view_count = models.IntegerField(default=0)
     post_slug = models.SlugField(max_length=100, unique=True)
 
+class Follow(models.Model):
+    user = models.ForeignKey(Web_users, on_delete=models.CASCADE, related_name='following')
+    following_user = models.ForeignKey(Web_users, on_delete=models.CASCADE, related_name='followers')
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class Post_image(models.Model):
     image_url = models.ImageField(upload_to="Post_Images" )
@@ -47,3 +51,14 @@ class Comment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_approved = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.id
+
+class Notification(models.Model):
+    user = models.ForeignKey(Web_users, on_delete=models.CASCADE, related_name='notifications')
+    post_by = models.ForeignKey(Web_users, on_delete=models.CASCADE, related_name='posted_notifications')
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    

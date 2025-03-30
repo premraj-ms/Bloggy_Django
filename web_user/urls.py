@@ -38,8 +38,13 @@ urlpatterns = [
     
     path('user/<user_slug>', views.users, name="user_page"),
     path('live-search/', views.live_search, name='live_search'),
+    path('follow-toggle/<int:user_id>/', views.FollowToggleView.as_view(), name='follow_toggle'),
+    path("deletecomment/<int:cid>/", views.deletecomment, name="deletecomment"),
+    path('fetch-notifications/', views.fetch_notifications, name='fetch-notifications'),
+    
+    path('following/',views.followers, name='following'),
     
     path('comments_save/<int:post_id>', views.comments_save, name='comments_save'),
-    path('<category>/<post>', views.web_post, name="web_post"),
+    path('<slug:category>/<slug:post>/', views.web_post, name="web_post"),
     
 ]
